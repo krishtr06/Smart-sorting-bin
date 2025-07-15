@@ -62,6 +62,7 @@ Built for the **DigiGreen Ideathon 2025**, this project focuses on sustainabilit
 | Servo Motors (x3)     | Rotate lid, open bio lid, sprinkle microbes |
 | Microbe Dispenser     | External refillable module                  |
 | Fan + Charcoal Filter | Odor control in compost bin                 |
+
 📈 Market Potential & Scalability
 Can scale to hostels, apartments, corporate offices, municipalities
 
@@ -81,6 +82,7 @@ Future upgrades:
 | Odor control system    | ❌             | ✅       |
 | Paper+plastic grouping | ❌             | ✅       |
 | App-free, low cost     | ❌             | ✅       |
+
 🛠️ Built By
 👨‍🔧 Krishnan T R – Hardware & Sensor Design
 👨‍💻 Mohamed Shaihd - Research 
