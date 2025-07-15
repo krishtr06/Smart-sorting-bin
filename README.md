@@ -1,90 +1,92 @@
-# Smart-sorting-bin
-Auto-sorting bin that classifies waste and starts composting using sensors
-# 🗑️ Smart Auto-Sorting Bin with In-Built Composting
+#include <Servo.h>
 
-A smart waste bin that automatically classifies waste into **bio-waste**, **e-waste**, and **dry recyclables** (paper + plastic), and even **starts composting** by dispensing microbes — all without human input.
+// Sensor pins
+const int moisturePin = A0;
+const int metalSensorPin = 2;
 
-Built for the **DigiGreen Ideathon 2025**, this project focuses on sustainability, automation, and real-world usability.
+// Servo objects
+Servo lidRotator;
+Servo bioLid;
+Servo microbeDispenser;
 
----
+// Servo pins
+const int rotatorPin = 9;
+const int bioLidPin = 10;
+const int microbePin = 11;
 
-## 💡 Big Idea Statement
+// Thresholds
+const int moistureThreshold = 500; // Adjust based on your sensor
+const int metalDetected = HIGH;
 
-> “A bin that senses, sorts, and starts composting — all before you walk away.”
+void setup() {
+  Serial.begin(9600);
 
----
+  // Attach servos
+  lidRotator.attach(rotatorPin);
+  bioLid.attach(bioLidPin);
+  microbeDispenser.attach(microbePin);
 
-## 🧩 Features
+  // Setup pins
+  pinMode(metalSensorPin, INPUT);
 
-- 🤖 **Sensor-based classification** of waste  
-- 🔁 **Rotating lid system** routes waste into 3 internal bins  
-- 🦠 **Microbe dispenser** starts composting for bio-waste  
-- 🧴 Combines **paper + plastic as dry recyclables** for simpler sorting  
-- 🧼 **Fan + charcoal filter** to reduce odor  
-- 📦 Compact, modular, and fully autonomous
+  // Initial positions
+  lidRotator.write(90); // Neutral
+  bioLid.write(0);       // Closed
+  microbeDispenser.write(0); // Idle
+}
 
----
+void loop() {
+  int moisture = analogRead(moisturePin);
+  int metal = digitalRead(metalSensorPin);
 
-## 📌 Problem Worth Solving
+  Serial.print("Moisture: ");
+  Serial.print(moisture);
+  Serial.print("  Metal: ");
+  Serial.println(metal);
 
-❌ Most households do not properly segregate waste  
-❌ Manual sorting is time-consuming, unsafe, and inaccurate  
-❌ E-waste and compostables often end up in landfills  
-✅ A smart, sensor-based bin can solve all this at the **source**
+  delay(1000); // debounce
 
----
+  if (moisture > moistureThreshold) {
+    sortToBio();
+  } else if (metal == HIGH) {
+    sortToEwaste();
+  } else {
+    sortToDryWaste();
+  }
 
-## 🎯 Target Users
+  delay(5000); // Wait before next reading
+}
 
-- 🏡 Urban households  
-- 🏫 Schools & colleges  
-- 🏢 Offices & co-working spaces  
-- 🌇 Smart city communities
+void sortToBio() {
+  Serial.println("Sorting to BIO-WASTE");
 
----
+  lidRotator.write(0); // Rotate to bio chamber
+  delay(1000);
 
-## ⚙️ How It Works
+  bioLid.write(90); // Open bio lid
+  delay(1000);
 
-```text
-1. Waste is dropped into the top inlet
-2. Sensors detect:
-   - High moisture → Bio-waste
-   - Metal → E-waste
-   - Else → Dry recyclables (paper/plastic)
-3. Rotating lid aligns with the correct chamber
-4. Bio chamber receives microbes for composting
-5. Lid seals + fan activates to reduce odor
-| Component             | Purpose                                     |
-| --------------------- | ------------------------------------------- |
-| Arduino Uno / ESP32   | Microcontroller                             |
-| Moisture Sensor       | Detects bio-waste                           |
-| Inductive Sensor      | Detects e-waste                             |
-| Servo Motors (x3)     | Rotate lid, open bio lid, sprinkle microbes |
-| Microbe Dispenser     | External refillable module                  |
-| Fan + Charcoal Filter | Odor control in compost bin                 |
+  microbeDispenser.write(90); // Sprinkle microbes
+  delay(500);
+  microbeDispenser.write(0);  // Reset dispenser
 
-📈 Market Potential & Scalability
-Can scale to hostels, apartments, corporate offices, municipalities
+  delay(500);
+  bioLid.write(0); // Close bio lid
+  lidRotator.write(90); // Return to center
+}
 
-Future upgrades:
+void sortToEwaste() {
+  Serial.println("Sorting to E-WASTE");
 
-🌐 IoT-enabled level tracking
+  lidRotator.write(45); // Rotate to e-waste chamber
+  delay(2000);
+  lidRotator.write(90); // Back to center
+}
 
-🌞 Solar-powered bin
+void sortToDryWaste() {
+  Serial.println("Sorting to DRY RECYCLABLES");
 
-📱 App-connected compost monitor
-
-🧱 Auto-compost brick press
-| Feature                | Existing Bins | Our Bin |
-| ---------------------- | ------------- | ------- |
-| Auto sorting           | ❌             | ✅       |
-| Compost microbe dosing | ❌             | ✅       |
-| Odor control system    | ❌             | ✅       |
-| Paper+plastic grouping | ❌             | ✅       |
-| App-free, low cost     | ❌             | ✅       |
-
-🛠️ Built By
-👨‍🔧 Krishnan T R – Hardware & Sensor Design
-👨‍💻 Mohamed Shaihd - Research 
-👨‍💻 Sanjay O - Design & Development
-👨‍💻 Jennis Sanjay Alan A - Documentation
+  lidRotator.write(135); // Rotate to dry recyclables
+  delay(2000);
+  lidRotator.write(90); // Back to center
+}
